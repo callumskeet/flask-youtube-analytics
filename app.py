@@ -270,8 +270,6 @@ def main():
     # atexit.register(lambda: scheduler.shutdown())
 
 
-
-
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification.
     # ACTION ITEM for developers:
