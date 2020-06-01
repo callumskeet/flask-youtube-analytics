@@ -27,7 +27,7 @@ class YTstats:
 
     def get_channel_video_data(self):
         # 1) get video ids
-        channel_videos = self._get_channel_videos(limit=2)
+        channel_videos = self._get_channel_videos(limit=50)
         # 2) get video stats
         parts = ["snippet", "statistics", "contentDetails"]
         for video_id in tqdm(channel_videos):
@@ -61,7 +61,6 @@ class YTstats:
 
         vid, npt = self._get_channel_videos_per_page(url)
         idx = 0
-        npt = None
         while npt is not None:
             next_url = url + "&pageToken=" + npt
             next_vid, npt = self._get_channel_videos_per_page(next_url)
