@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+    <section class="h-100vh w-100vw flex items-center sans absolute-center justify-center" tabindex="-1" style="outline: none;">
+        <div class="p-5 my-3 pattern-diagonal-stripes-md red bg-orange text-center">
+            {% if error %}
+                <div class=error><p class="white"><strong>Error:</strong> {{ error }}</p></div>
+            {% endif %}
+            <form method=post>
+                <dl class="lh-5 black bg-white-40 px-3 py-2 br-3 mono">
+                    <dt>Username:
+                    <dd><input type=text name=username value="{{ request.form.username }}">
+                    <dt>Password:
+                    <dd><input type=password name=password>
+                </dl>
+                <p><input type=submit value=Login>
+            </form>
+        </div>
+    </section>
+{% endblock %}
