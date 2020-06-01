@@ -270,7 +270,7 @@ def main():
     # Scheduler variables
     scheduler = BackgroundScheduler(daemon=True)
     scheduler.add_job(update_video_data, 'cron', hour=16)
-    scheduler.add_job(update_retention_data, 'cron', hour=16, minute=10)
+    scheduler.add_job(update_retention_data, 'cron', hour=17)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
