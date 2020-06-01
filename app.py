@@ -6,12 +6,13 @@ import requests
 import json
 import atexit
 
+from pathlib import Path
+
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
 import gspread
-
 import pandas as pd
 
 from datetime import date
@@ -250,16 +251,26 @@ def save_to_sqlite(df, file_name, table_name):
         df.to_sql(table_name, con, if_exists='replace', index=False)
 
 
+def make_dirs():
+    Path("./data/").mkdir(exist_ok=True)
+    Path("./keys/").mkdir(exist_ok=True)
+
+
 # Scheduled jobs
 def test():
     print("Scheduler is working")
 
 
-# Scheduler variables
-# scheduler = BackgroundScheduler(daemon=True)
-# scheduler.add_job(update_retention_data, 'interval', seconds=20)
-# scheduler.start()
-# atexit.register(lambda: scheduler.shutdown())
+def main():
+    make_dirs()
+    # Scheduler variables
+    # scheduler = BackgroundScheduler(daemon=True)
+    # scheduler.add_job(update_retention_data, 'interval', seconds=20)
+    # scheduler.start()
+    # atexit.register(lambda: scheduler.shutdown())
+
+
+
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification.
