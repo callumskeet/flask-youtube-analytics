@@ -87,18 +87,16 @@ def get_video_data():
 @app.route('/retention')
 def update_retention_data():
     with app.app_context():
-        df = get_retention_data()
+        credentials = get_oauth_cred()
+        if credentials is None:
+            return flask.redirect('authorize')
+        df = get_retention_data(credentials)
         save_to_sqlite(df, YOUTUBE_DB, 'retention')
         upload_to_gsheets(df, SPREADSHEET_KEY, 2)
     return flask.redirect(flask.url_for('index'))
 
 
-def get_retention_data():
-    # Load credentials from the session.
-    with open(OAUTH_TOKEN_FILE, 'r') as f:
-        credentials = google.oauth2.credentials.Credentials(
-            **json.load(f))
-
+def get_retention_data(credentials):
     youtube = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
@@ -249,6 +247,16 @@ def save_to_sqlite(df, file_name, table_name):
     engine = create_engine(f'sqlite:///{file_name}')
     with engine.connect() as con:
         df.to_sql(table_name, con, if_exists='replace', index=False)
+
+
+def get_oauth_cred():
+    # Load credentials from the session.
+    if os.path.isfile(OAUTH_TOKEN_FILE):
+        with open(OAUTH_TOKEN_FILE, 'r') as f:
+            credentials = google.oauth2.credentials.Credentials(
+                **json.load(f))
+        return credentials
+    return None
 
 
 def make_dirs():
