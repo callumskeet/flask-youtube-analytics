@@ -87,7 +87,7 @@ def get_video_data():
 @app.route('/retention')
 def update_retention_data():
     with app.app_context():
-        credentials = get_oauth_cred()
+        credentials = get_oauth_cred_from_file()
         if credentials is None:
             return flask.redirect('authorize')
         df = get_retention_data(credentials)
@@ -249,7 +249,7 @@ def save_to_sqlite(df, file_name, table_name):
         df.to_sql(table_name, con, if_exists='replace', index=False)
 
 
-def get_oauth_cred():
+def get_oauth_cred_from_file():
     # Load credentials from the session.
     if os.path.isfile(OAUTH_TOKEN_FILE):
         with open(OAUTH_TOKEN_FILE, 'r') as f:
@@ -264,18 +264,15 @@ def make_dirs():
     Path("./keys/").mkdir(exist_ok=True)
 
 
-# Scheduled jobs
-def test():
-    print("Scheduler is working")
-
-
 def main():
     make_dirs()
+
     # Scheduler variables
-    # scheduler = BackgroundScheduler(daemon=True)
-    # scheduler.add_job(update_retention_data, 'interval', seconds=20)
-    # scheduler.start()
-    # atexit.register(lambda: scheduler.shutdown())
+    scheduler = BackgroundScheduler(daemon=True)
+    scheduler.add_job(update_video_data, 'cron', hour=16)
+    scheduler.add_job(update_retention_data, 'cron', hour=16, minute=10)
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())
 
 
 main()
