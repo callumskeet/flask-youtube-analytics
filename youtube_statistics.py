@@ -2,8 +2,6 @@ import requests
 import json
 import os
 
-from tqdm import tqdm
-
 
 class YTstats:
 
@@ -30,7 +28,7 @@ class YTstats:
         channel_videos = self._get_channel_videos(limit=50)
         # 2) get video stats
         parts = ["snippet", "statistics", "contentDetails"]
-        for video_id in tqdm(channel_videos):
+        for video_id in channel_videos:
             for part in parts:
                 data = self._get_single_video_data(video_id, part)
                 channel_videos[video_id].update(data)
