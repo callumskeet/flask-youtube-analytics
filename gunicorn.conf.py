@@ -1,7 +1,10 @@
 from dotenv import load_dotenv
 from os import getenv
+from pathlib import Path
 
 load_dotenv()
+
+Path("log").mkdir(exist_ok=True)
 
 bind = 'localhost:5000'
 
