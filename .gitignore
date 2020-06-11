@@ -3,6 +3,7 @@ data
 keys
 .idea
 *.csv
+*.pid
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Backup template
