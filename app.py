@@ -20,7 +20,7 @@ from sqlalchemy import create_engine
 from youtube_statistics import YTstats
 from dotenv import load_dotenv
 from celery import Celery
-from apscheduler.schedulers.background import BackgroundScheduler
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -69,6 +69,21 @@ def video_data():
     return flask.redirect(flask.url_for('index'))
 
 
+@celery.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    credentials = get_oauth_cred_from_file()
+
+    sender.add_periodic_task(
+        crontab(hour=16),
+        update_video_data.s()
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=16),
+        update_retention_data.s(credentials)
+    )
+
+
 @celery.task
 def update_video_data():
     with app.app_context():
@@ -96,15 +111,22 @@ def get_video_data():
 
 
 @app.route('/retention')
-def update_retention_data():
+def retention():
+    credentials = get_oauth_cred_from_file()
+    if credentials is None:
+        return flask.redirect('authorize')
+
+    update_retention_data.delay(credentials)
+    flask.flash('Updating retention data')
+    return flask.redirect(flask.url_for('index'))
+
+
+@celery.task
+def update_retention_data(credentials):
     with app.app_context():
-        credentials = get_oauth_cred_from_file()
-        if credentials is None:
-            return flask.redirect('authorize')
         df = get_retention_data(credentials)
         save_to_sqlite(df, YOUTUBE_DB, 'retention')
         upload_to_gsheets(df, SPREADSHEET_KEY, 2)
-    return flask.redirect(flask.url_for('index'))
 
 
 def get_retention_data(credentials):
@@ -277,13 +299,6 @@ def make_dirs():
 
 def main():
     make_dirs()
-
-    # Scheduler variables
-    scheduler = BackgroundScheduler(daemon=True)
-    scheduler.add_job(update_video_data, 'cron', hour=16)
-    scheduler.add_job(update_retention_data, 'cron', hour=17)
-    scheduler.start()
-    atexit.register(lambda: scheduler.shutdown())
 
 
 main()
