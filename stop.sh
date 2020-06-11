@@ -7,6 +7,6 @@ gunicorn_pid='pid/gunicorn.pid'
 echo "stopping youtube analytics server"
 kill -TERM $(cat $celerybeat_pid)
 kill -TERM $(cat $celeryworker_pid)
-kill $(cat gunicorn_pid)
-rabbitmq-server stop
+kill $(cat $gunicorn_pid)
+rabbitmqctl shutdown
 echo "success"
