@@ -44,8 +44,8 @@ class YTstats:
         data = json.loads(json_url.text)
         try:
             data = data['items'][0][part]
-        except KeyError:
-            print("error")
+        except KeyError as e:
+            print("Error:", e)
             data = dict()
 
         return data
@@ -84,8 +84,8 @@ class YTstats:
                 if kind == 'youtube#video':
                     video_id = item['id']['videoId']
                     channel_videos[video_id] = dict()
-            except KeyError:
-                print("error")
+            except KeyError as e:
+                print("Error:", e)
 
         return channel_videos, next_page_token
 
