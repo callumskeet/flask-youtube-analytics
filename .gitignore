@@ -4,6 +4,8 @@ keys
 .idea
 *.csv
 *.pid
+*.dat
+*.dir
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Backup template

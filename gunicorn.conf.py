@@ -8,9 +8,9 @@ Path("log").mkdir(exist_ok=True)
 
 bind = 'localhost:5000'
 
-daemon = False
+daemon = True
 
-pidfile = 'gunicorn.pid'
+pidfile = 'pid/gunicorn.pid'
 accesslog = 'log/gunicorn_access.log'
 errorlog = 'log/gunicorn_error.log'
 loglevel = 'debug'
