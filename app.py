@@ -19,6 +19,7 @@ from datetime import date
 from sqlalchemy import create_engine
 from youtube_statistics import YTstats
 from dotenv import load_dotenv
+from celery import Celery
 from apscheduler.schedulers.background import BackgroundScheduler
 
 load_dotenv()
@@ -50,6 +51,11 @@ app = flask.Flask(__name__)
 # key. See https://flask.palletsprojects.com/quickstart/#sessions.
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
+# Celery config
+celery = Celery(app.name,
+                broker=os.getenv('CELERY_BROKER_URL'),
+                backend=os.getenv('CELERY_RESULT_BACKEND'))
+
 
 @app.route('/')
 def index():
@@ -57,6 +63,13 @@ def index():
 
 
 @app.route('/video-data')
+def video_data():
+    update_video_data.delay()
+    flask.flash('Updating video data')
+    return flask.redirect(flask.url_for('index'))
+
+
+@celery.task
 def update_video_data():
     with app.app_context():
         data = get_video_data()
@@ -73,8 +86,6 @@ def update_video_data():
         df_video = df_video.drop(['thumbnails', 'tags', 'localized', 'contentRating'], axis=1)
         save_to_sqlite(df_video, YOUTUBE_DB, 'video_data')
         upload_to_gsheets(df_video, SPREADSHEET_KEY, 1)
-
-    return flask.redirect(flask.url_for('index'))
 
 
 def get_video_data():
