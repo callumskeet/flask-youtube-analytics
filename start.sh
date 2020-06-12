@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-mkdir log pid
+
+mkdir -p log pid
 
 gunicorn app:app
 
