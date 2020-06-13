@@ -256,6 +256,7 @@ def login():
     return flask.render_template('login.html', error=error)
 
 
+# Helper functions
 def credentials_to_dict(credentials):
     return {'token': credentials.token,
             'refresh_token': credentials.refresh_token,
